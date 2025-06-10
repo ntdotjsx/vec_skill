@@ -4,22 +4,27 @@ $ROUTER = new class {
     private $routes = [];
 
     public function get(string $path, callable $callback) {
-        $this->routes['GET'][$path] = $callback;
+        $this->routes['GET'][] = [$path, $callback];
     }
 
     public function post(string $path, callable $callback) {
-        $this->routes['POST'][$path] = $callback;
+        $this->routes['POST'][] = [$path, $callback];
     }
 
     public function run() {
         $method = $_SERVER['REQUEST_METHOD'];
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-        foreach ($this->routes[$method] ?? [] as $path => $callback) {
-            if ($path === $uri) {
-                return call_user_func($callback);
+        foreach ($this->routes[$method] ?? [] as [$path, $callback]) {
+            $pattern = preg_replace('#\{([^/]+)\}#', '([^/]+)', $path);
+            $pattern = "#^" . $pattern . "$#";
+
+            if (preg_match($pattern, $uri, $matches)) {
+                array_shift($matches); // remove full match
+                return call_user_func_array($callback, $matches);
             }
         }
+
         http_response_code(404);
         echo "404 Not Found";
     }
