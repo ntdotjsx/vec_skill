@@ -1,4 +1,3 @@
-<?php require 'class/db.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +6,6 @@
     <title>GOGOGO</title>
 </head>
 <body>
-    <?php $DATABASE->test(); ?>
+    <p>sdsd</p>
 </body>
 </html>
